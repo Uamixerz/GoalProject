@@ -1,20 +1,23 @@
 import React from 'react';
-import { FlatList, StyleSheet, ScrollView } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import CustomRow from './CustomRow';
 import { ICategoryItem } from "../../home/types";
+import {useTheme} from "../../../context/ThemeContext";
+
+const {colors} = useTheme();
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    backgroundColor: colors.background,
+    flex: 1
   },
 });
 interface CustomRowProps {
   list: ICategoryItem[];
-
 }
 
 const CustomListView: React.FC<CustomRowProps> = ({ list }) => (
-  <ScrollView style={styles.container}>
+  <View style={styles.container} >
     <FlatList
       data={list}
       renderItem= {({ item }) => <CustomRow
@@ -23,7 +26,7 @@ const CustomListView: React.FC<CustomRowProps> = ({ list }) => (
         image_url={'https://slon.itstep.click/images/'+item.image}
       />}
     />
-  </ScrollView>
+  </View>
 );
 
 export default CustomListView;

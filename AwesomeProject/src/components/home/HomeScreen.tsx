@@ -1,34 +1,61 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios/index";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { ICategoryItem } from "./types";
-import CustomListView from "../category/show/CustomListView";
+import CustomListview from "./CustomListview";
+import http_common from "../../http_common";
+import { useRoute } from "@react-navigation/native";
+
+const HomeScreen = () => {
+  const [list, setList] = useState<ICategoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const route = useRoute();
+
+  const updateDataBase = () => {
+    http_common.get<ICategoryItem[]>("/api/categories/list")
+      .then(resp => {
+        const { data } = resp;
+        setList(data);
+        setIsLoading(false);
+        //console.log("Response data ---- ", data);
+      })
+      .catch(error => {
+        setIsLoading(false);
+        console.error("Error fetching data:", error);
+      });
+  };
+
+  useEffect(() => {
+    // @ts-ignore
+    if (route.params?.shouldUpdateDatabase) {
+      setIsLoading(true);
+      updateDataBase();
+    }
+  }, [route.params]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    updateDataBase();
+  }, []);
+
+  return (
+    <>
+      <View style={styles.container}>
+        <Text style={{ fontSize: 25, textAlign: "center", fontWeight: "700" }}>Категорії</Text>
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#0000ff" /> // Прогрес-бар показується поки завантажуються дані
+        ) : (
+          <CustomListview
+            list={list}
+          />)}
+      </View>
+    </>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 22,
-  },
-  item: {
-    padding: 10,
-    fontSize: 18,
-    height: 44,
-  },
+    backgroundColor: "#FCFCFC"
+  }
 });
-const HomeScreen = () => {
-  const [myItems, setMyItems] = useState<ICategoryItem[]>([]);
-
-  useEffect(() => {
-    axios.get<ICategoryItem[]>("https://slon.itstep.click/api/categories/list").then(resp => {
-      console.log("---server resp---", resp.data);
-      setMyItems(resp.data);
-    });
-  }, []);
-
-  return (
-    <View style={styles.container}>
-      <CustomListView list={myItems} />
-    </View>
-  );
-};
 export default HomeScreen;
