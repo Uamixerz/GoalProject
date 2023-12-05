@@ -17,9 +17,12 @@ import { useTheme } from "../../../contexts/ThemeContext";
 import DocumentPicker, { DirectoryPickerResponse } from "react-native-document-picker";
 import ScrollView = Animated.ScrollView;
 import http_common from "../../../http_common";
+import { CategoryActionType, ICategoryCreate } from "../types";
+import { useDispatch } from "react-redux";
+import { CreateCategoryAction } from "../CategoryActions";
 
 
-const CreateScreen = () => {
+const CategoryEditScreen = () => {
   const navigation = useNavigation();
   const [pickedImage, setPickedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -109,7 +112,7 @@ const CreateScreen = () => {
       fontSize: 14
     }
   });
-
+  const dispatch = useDispatch();
 
   const pickImage = async () => {
     try {
@@ -125,8 +128,6 @@ const CreateScreen = () => {
           }
         }
       }
-      // Handle the picked image, for example, set it in state
-      //setPickedImage(result.uri);
 
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
@@ -149,28 +150,18 @@ const CreateScreen = () => {
       description: ""
     }
   });
-  const onSubmit = async (data: { name: any; description: any; }) => {
+  const onSubmit = async (data: any) => {
     try {
       setIsLoading(true);
-      console.log(data);
-      const formData = new FormData();
-      formData.append("image", {
-        uri: pickedImage,
-        type: "image/jpeg",
-        name: "my.jpg"
-      });
-      formData.append("name", data.name);
-      formData.append("description", data.description);
-      const resp = await http_common.post(`/api/categories/create`,
-        formData, {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        });
+      const model: ICategoryCreate = {
+        name: data.name,
+        image: pickedImage ? pickedImage : "",
+        description: data.description
+      };
+      await CreateCategoryAction(dispatch, model);
       setIsLoading(false);
       // @ts-ignore
-      //navigation.navigate('Home');
-      navigation.navigate("Home", { shouldUpdateDatabase: true });
+      navigation.navigate("Home");
     } catch (error) {
       setIsLoading(false);
       console.log("Server error", error);
@@ -246,26 +237,19 @@ const CreateScreen = () => {
             <ActivityIndicator size="large" color="#0000ff" /> // Прогрес-бар показується поки завантажуються дані
           ) : (
             <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.loginBtn}>
-              <Text style={styles.loginBtnText}>Створити</Text>
+              <Text style={styles.loginBtnText}>Редагувати</Text>
             </TouchableOpacity>)}
-          {/* <Button title='fdsfs' onPress={handleSubmit}></Button> */}
           <TouchableOpacity style={styles.rememberBlock} onPress={() => navigation.navigate("Home")}>
             <Text style={styles.forgotText}>До списку</Text>
           </TouchableOpacity>
         </View>
-
-        {/* <Button title='Login' style={styles.loginBtn} /> */}
       </View>
 
-      {/*<Button title="Create" onPress={handleSubmit(onSubmit)}/>*/}
-      {/*    <Button*/}
-      {/*        color="#233A6F"*/}
-      {/*        title="Реєстрація"*/}
-      {/*        onPress={() => navigation.navigate('Home')}*/}
-      {/*    />*/}
     </ScrollView>
     // </KeyboardAvoidingView>
   );
 };
 
-export default CreateScreen;
+export default CategoryEditScreen;
+
+

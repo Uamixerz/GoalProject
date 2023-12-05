@@ -1,40 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { ICategoryItem } from "./types";
-import CustomListview from "./CustomListview";
+import CustomListview from "../category/show/CategoryListview";
 import http_common from "../../http_common";
 import { useRoute } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { CategoryActionType } from "../category/types";
+import { SetCategoryAction } from "../category/CategoryActions";
 
 const HomeScreen = () => {
-  const [list, setList] = useState<ICategoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const route = useRoute();
 
-  const updateDataBase = () => {
-    http_common.get<ICategoryItem[]>("/api/categories/list")
-      .then(resp => {
-        const { data } = resp;
-        setList(data);
-        setIsLoading(false);
-        //console.log("Response data ---- ", data);
-      })
-      .catch(error => {
-        setIsLoading(false);
-        console.error("Error fetching data:", error);
-      });
-  };
-
-  useEffect(() => {
-    // @ts-ignore
-    if (route.params?.shouldUpdateDatabase) {
-      setIsLoading(true);
-      updateDataBase();
-    }
-  }, [route.params]);
+  const dispatch = useDispatch();
+  const myList = useSelector((state : any) => state.category.list);
 
   useEffect(() => {
     setIsLoading(true);
-    updateDataBase();
+    SetCategoryAction(dispatch);
+    setIsLoading(false);
   }, []);
 
   return (
@@ -45,7 +28,7 @@ const HomeScreen = () => {
           <ActivityIndicator size="large" color="#0000ff" /> // Прогрес-бар показується поки завантажуються дані
         ) : (
           <CustomListview
-            list={list}
+            list={myList}
           />)}
       </View>
     </>
