@@ -7,7 +7,7 @@ import { createStackNavigator, StackNavigationOptions } from "@react-navigation/
 
 type RootStackParamList = {
   CategoryEditScreen: undefined;
-  Home: undefined;
+  HomeMain: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -19,9 +19,9 @@ const Router = () => {
   const { colors, isDark } = useTheme();
   return (
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
-      <Stack.Navigator initialRouteName="Home" >
+      <Stack.Navigator initialRouteName="HomeMain" >
         <Stack.Screen
-          name="Home"
+          name="HomeMain"
           component={MainStackNavigator}
         />
         <Stack.Screen

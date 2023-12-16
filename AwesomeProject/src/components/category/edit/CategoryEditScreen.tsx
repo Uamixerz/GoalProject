@@ -11,7 +11,7 @@ import {
   Image,
   TouchableOpacity, Animated, ActivityIndicator
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Controller, useForm } from "react-hook-form";
 import { useTheme } from "../../../contexts/ThemeContext";
 import DocumentPicker, { DirectoryPickerResponse } from "react-native-document-picker";
@@ -113,7 +113,7 @@ const CategoryEditScreen = () => {
     }
   });
   const dispatch = useDispatch();
-
+  const route = useRoute();
   const pickImage = async () => {
     try {
       const result = await DocumentPicker.pick({
@@ -177,7 +177,7 @@ const CategoryEditScreen = () => {
         <Image style={styles.tinyLogo} resizeMode={"contain"} source={require("../../../assets/logo.png")} />
       </View>
       <View style={styles.contentContainer}>
-        <Text style={styles.loginText}>Створити категорію</Text>
+        <Text style={styles.loginText}>Редагування категорії</Text>
         <View style={{}}>
           <Text style={styles.label}>Назва</Text>
           <Controller
